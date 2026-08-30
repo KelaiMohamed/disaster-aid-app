@@ -1,0 +1,175 @@
+<div class="h-screen flex w-full items-center gap-y-2.5 flex-col">
+  <div class="text-center text-xl font-bold">Your Assistant Requests</div>
+  <button class="btn btn-md btn-primary w-[20%]" (click)="showAddForm = true">
+    Add Assistant Request
+  </button>
+
+  <div class="container mx-auto">
+    <div class="flex justify-center flex-wrap gap-2">
+      <div
+        *ngFor="let offer of assistanceRequests"
+        class="flex-shrink-0 w-full sm:w-1/2 md:w-1/3 lg:w-1/4"
+      >
+        <div class="card bg-base-100 shadow-xl">
+          <div class="card-body">
+            <h1 class="text-xl">
+              <span class="font-bold text-black">Description:</span>
+            </h1>
+            <p class="card-title text-sm">{{ offer.description }}</p>
+            <!-- <p class="card-title text-xl mb-2"> -->
+            <!--   <span class="font-bold text-black">State:</span -->
+            <!--   ><span class="text-green-500">{{ offer.state }}</span> -->
+            <!-- </p> -->
+
+            <div class="flex items-center space-x-4">
+              <button
+                class="flex-shrink-0 bg-red-600 text-white rounded p-2 text-sm hover:bg-red-500"
+                (click)="deleteIte(offer?.id)"
+              >
+                Delete
+              </button>
+              <button
+                class="flex-shrink-0 bg-blue-400 text-white rounded p-2 text-sm hover:bg-indigo-700"
+                [routerLink]="'/victim/assistant-details/' + offer?.id"
+              >
+                See More
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div
+    class="fixed top-0 left-0 right-0 bottom-0 bg-black bg-opacity-50 flex items-center justify-center"
+    *ngIf="showAddForm"
+  >
+    <div class="card bg-gray-300 w-1/2 shadow-xl">
+      <div class="card-body">
+        <h1 class="text-xl">
+          <span class="font-bold text-black">Add Assistant Request</span>
+        </h1>
+        <form (ngSubmit)="addAssistantRequest()" #addForm="ngForm">
+          <div class="mb-4">
+            <label
+              for="description"
+              class="block text-sm font-medium text-gray-700"
+              >Description:</label
+            >
+            <textarea
+              id="description"
+              name="description"
+              [(ngModel)]="newAssistanceRequest.description"
+              class="textarea-lg text-sm form-input mt-1 block w-full rounded-md"
+              required
+            ></textarea>
+          </div>
+
+          <div class="mb-4">
+            <label for="skills" class="block text-sm font-medium text-gray-700"
+              >Skills:</label
+            >
+            <select
+              id="skills"
+              name="skills"
+              [(ngModel)]="newAssistanceRequest.skills"
+              class="form-select mt-1 block w-full rounded-md"
+              multiple
+              required
+            >
+              <option
+                *ngFor="let skill of skillstoSelect"
+                [value]="{ name: skill }"
+              >
+                {{ skill }}
+              </option>
+            </select>
+          </div>
+
+          <div class="mb-4">
+            <label for="aidType" class="block text-sm font-medium text-gray-700"
+              >Aid Type:</label
+            >
+            <select
+              id="aidType"
+              name="aidType"
+              [(ngModel)]="newAssistanceRequest.aidType"
+              class="form-select mt-1 block w-full rounded-md"
+              multiple
+              required
+            >
+              <option
+                *ngFor="let aidType of aidTypestoSelect"
+                [value]="{ name: aidType }"
+              >
+                {{ aidType }}
+              </option>
+            </select>
+          </div>
+
+          <div class="mb-4">
+            <label
+              for="locationAddress"
+              class="block text-sm font-medium text-gray-700"
+              >Location Address:</label
+            >
+            <input
+              type="text"
+              id="locationAddress"
+              name="locationAddress"
+              [(ngModel)]="newAssistanceRequest.location.address"
+              class="form-input mt-1 block w-full rounded-md"
+            />
+          </div>
+
+          <div class="mb-4">
+            <label
+              for="locationStreet"
+              class="block text-sm font-medium text-gray-700"
+              >Location Street:</label
+            >
+            <input
+              type="text"
+              id="locationStreet"
+              name="locationStreet"
+              [(ngModel)]="newAssistanceRequest.location.street"
+              class="form-input mt-1 block w-full rounded-md"
+            />
+          </div>
+
+          <div class="mb-4">
+            <label
+              for="locationCity"
+              class="block text-sm font-medium text-gray-700"
+              >Location City:</label
+            >
+            <input
+              type="text"
+              id="locationCity"
+              name="locationCity"
+              [(ngModel)]="newAssistanceRequest.location.city"
+              class="form-input mt-1 block w-full rounded-md"
+            />
+          </div>
+
+          <div class="flex items-center justify-around">
+            <button
+              type="submit"
+              class="btn btn-success bg-green-400 border-none"
+            >
+              Add
+            </button>
+            <button
+              type="button"
+              class="btn btn-warning border-none"
+              (click)="showAddForm = false"
+            >
+              Quit
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

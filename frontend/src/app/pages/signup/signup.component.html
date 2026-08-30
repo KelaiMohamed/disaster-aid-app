@@ -1,0 +1,134 @@
+<div class="hero min-h-screen bg-base-100">
+  <div class="hero-content flex-col md:w-2/4 lg:flex-row-reverse">
+    <div class="text-center lg:text-left">
+      <h1 class="text-5xl font-bold text-neutral">Sign Up now!</h1>
+      <p class="py-6 text-neutral">Join!</p>
+    </div>
+    <div class="card flex-shrink-0 w-full max-w-sm shadow-2xl bg-base-100">
+      <form
+        [formGroup]="signupForm"
+        (ngSubmit)="signupHandler()"
+        class="card-body"
+      >
+        <div class="form-control">
+          <label class="label" for="name">
+            <span class="label-text text-neutral">Name</span>
+          </label>
+          <input
+            placeholder="Name"
+            formControlName="name"
+            class="input input-bordered"
+            required
+            minlength="4"
+          />
+          <div
+            *ngIf="
+              signupForm.get('name')?.invalid && signupForm.get('name')?.touched
+            "
+          >
+            <span class="text-error">
+              <div *ngIf="signupForm.get('name')?.hasError('required')">
+                Name is required.
+              </div>
+              <div *ngIf="signupForm.get('name')?.hasError('minlength')">
+                Name must be at least 4 characters long.
+              </div>
+            </span>
+          </div>
+        </div>
+        <div class="form-control">
+          <label class="label" for="email">
+            <span class="label-text text-neutral">Email</span>
+          </label>
+          <input
+            type="email"
+            placeholder="Email"
+            formControlName="email"
+            class="input input-bordered"
+            required
+            email
+          />
+          <div
+            *ngIf="
+              signupForm.get('email')?.invalid &&
+              signupForm.get('email')?.touched
+            "
+          >
+            <span class="text-error">
+              <div *ngIf="signupForm.get('email')?.hasError('required')">
+                Email is required.
+              </div>
+              <div *ngIf="signupForm.get('email')?.hasError('email')">
+                Invalid email format.
+              </div>
+            </span>
+          </div>
+        </div>
+        <div class="form-control">
+          <label class="label" for="password">
+            <span class="label-text text-neutral">Password</span>
+          </label>
+          <input
+            type="password"
+            placeholder="Password"
+            formControlName="password"
+            class="input input-bordered"
+            required
+            minlength="8"
+          />
+          <div
+            *ngIf="
+              signupForm.get('password')?.invalid &&
+              signupForm.get('password')?.touched
+            "
+          >
+            <span class="text-error">
+              <div *ngIf="signupForm.get('password')?.hasError('required')">
+                Password is required.
+              </div>
+              <div *ngIf="signupForm.get('password')?.hasError('minlength')">
+                Password must be at least 8 characters long.
+              </div>
+            </span>
+          </div>
+        </div>
+
+        <div class="form-control">
+          <label class="label" for="confirm_password">
+            <span class="label-text text-neutral">Confirm Password</span>
+          </label>
+          <input
+            type="password"
+            placeholder="Confirm Password"
+            formControlName="confirm_password"
+            class="input input-bordered"
+            required
+          />
+          <div
+            *ngIf="
+              signupForm.get('confirm_password')?.invalid &&
+              signupForm.get('confirm_password')?.touched
+            "
+          >
+            <span class="text-error">
+              <div
+                *ngIf="
+                  signupForm.hasError('passwordMismatch') &&
+                  signupForm.get('confirm_password')?.hasError('required')
+                "
+              >
+                Passwords do not match.
+              </div>
+            </span>
+          </div>
+        </div>
+        <div class="form-control flex gap-2">
+          <button class="btn btn-primary text-white" type="submit">
+            Sign Up
+          </button>
+          <a routerLink="/login" class="btn btn-primary text-white">Login</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

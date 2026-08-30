@@ -1,0 +1,22 @@
+<style>
+  body {
+    font-family: var(--font-family);
+  }
+</style>
+<!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * -->
+<!-- * * * * * * * * * * * The content above * * * * * * * * * * * -->
+<!-- * * * * * * * * * * is only a placeholder * * * * * * * * * * -->
+<!-- * * * * * * * * * * and can be replaced. * * * * * * * * * * * -->
+<!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * -->
+<!-- * * * * * * * * * * End of Placeholder * * * * * * * * * * * -->
+<!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * -->
+
+<ng-container *ngIf="notLogInOrSignUp()">
+  <app-nav-bar />
+</ng-container>
+
+<router-outlet></router-outlet>
+
+<ng-container *ngIf="notLogInOrSignUp()">
+  <app-footer />
+</ng-container>

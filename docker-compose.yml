@@ -1,0 +1,168 @@
+networks:
+  disaster-aid-net:
+    driver: bridge
+
+volumes:
+  postgres-data:
+
+services:
+  # ---------------------------------------------------------------------
+  # Data layer
+  # ---------------------------------------------------------------------
+  postgres:
+    image: postgres:16-alpine
+    container_name: disaster-aid-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
+    ports:
+      # Host-side port is configurable - defaults to Postgres's standard
+      # 5432, but that's also the default for any Postgres already
+      # installed natively on your machine (very common on Ubuntu) or
+      # running in another Docker project, which will make this fail to
+      # bind with "address already in use". If that happens, set
+      # DB_HOST_PORT in .env to something else (e.g. 5433) instead of
+      # editing this file - the container's own internal port (what every
+      # backend service actually connects to, via postgres:5432 on the
+      # Docker network) is unaffected either way.
+      - "${DB_HOST_PORT:-5432}:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./backend/postgres-init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - disaster-aid-net
+
+  # ---------------------------------------------------------------------
+  # Platform services
+  # ---------------------------------------------------------------------
+  registry-service:
+    build: ./backend/registry-service
+    container_name: disaster-aid-registry
+    ports:
+      - "8761:8761"
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8761/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+    networks:
+      - disaster-aid-net
+
+  gateway-service:
+    build: ./backend/gateway-service
+    container_name: disaster-aid-gateway
+    environment:
+      EUREKA_URI: http://registry-service:8761/eureka/
+      JWT_SECRET: ${JWT_SECRET:?JWT_SECRET must be set - see .env.example}
+    ports:
+      - "8080:8080"
+    depends_on:
+      registry-service:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+    networks:
+      - disaster-aid-net
+
+  # ---------------------------------------------------------------------
+  # Domain services
+  # ---------------------------------------------------------------------
+  auth-service:
+    build: ./backend/auth-service
+    container_name: disaster-aid-auth
+    environment:
+      DB_URL: jdbc:postgresql://postgres:5432/auth
+      DB_USERNAME: postgres
+      DB_PASSWORD: ${DB_PASSWORD:-postgres}
+      EUREKA_URI: http://registry-service:8761/eureka/
+      JWT_SECRET: ${JWT_SECRET:?JWT_SECRET must be set - see .env.example}
+    ports:
+      - "9898:9898"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      registry-service:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:9898/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    networks:
+      - disaster-aid-net
+
+  victim-service:
+    build: ./backend/victim-service
+    container_name: disaster-aid-victim
+    environment:
+      DB_URL: jdbc:postgresql://postgres:5432/victim
+      DB_USERNAME: postgres
+      DB_PASSWORD: ${DB_PASSWORD:-postgres}
+      EUREKA_URI: http://registry-service:8761/eureka/
+    ports:
+      - "8082:8082"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      registry-service:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8082/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    networks:
+      - disaster-aid-net
+
+  volunteer-service:
+    build: ./backend/volunteer-service
+    container_name: disaster-aid-volunteer
+    environment:
+      DB_URL: jdbc:postgresql://postgres:5432/volunteer
+      DB_USERNAME: postgres
+      DB_PASSWORD: ${DB_PASSWORD:-postgres}
+      EUREKA_URI: http://registry-service:8761/eureka/
+    ports:
+      - "8081:8081"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      registry-service:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8081/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    networks:
+      - disaster-aid-net
+
+  # ---------------------------------------------------------------------
+  # Frontend
+  # ---------------------------------------------------------------------
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        GATEWAY_URL: ${GATEWAY_URL:-http://localhost:8080}
+        GOOGLE_MAPS_API_KEY: ${GOOGLE_MAPS_API_KEY:-}
+    container_name: disaster-aid-frontend
+    ports:
+      - "4200:80"
+    depends_on:
+      - gateway-service
+    networks:
+      - disaster-aid-net

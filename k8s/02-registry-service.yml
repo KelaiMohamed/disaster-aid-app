@@ -1,0 +1,64 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: eureka
+spec:
+  # NOTE: the original manifest defined the Eureka StatefulSet with
+  # `serviceName: eureka` but never actually created this Service object.
+  # `serviceName` on a StatefulSet only *declares* which governing Service
+  # provides its pods' stable network identity - Kubernetes does not
+  # create that Service for you. Without it, "http://eureka:8761" doesn't
+  # resolve for any other pod, and every service that depends on Eureka
+  # for discovery silently fails. This Service is what makes that
+  # hostname actually work.
+  clusterIP: None
+  selector:
+    app: eureka
+  ports:
+    - port: 8761
+      targetPort: 8761
+
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: eureka
+spec:
+  serviceName: eureka
+  replicas: 1
+  selector:
+    matchLabels:
+      app: eureka
+  template:
+    metadata:
+      labels:
+        app: eureka
+    spec:
+      containers:
+        - name: eureka
+          image: ghcr.io/OWNER/REPO/registry-service:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8761
+          env:
+            - name: SERVER_PORT
+              value: "8761"
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: 8761
+            initialDelaySeconds: 20
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8761
+            initialDelaySeconds: 30
+            periodSeconds: 15
+          resources:
+            requests:
+              cpu: 250m
+              memory: 384Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi

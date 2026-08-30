@@ -1,0 +1,70 @@
+<div class="container py-4 mx-auto">
+  <!-- Display Skills -->
+  <div class="mt-8 flex flex-col w-full justify-center items-center">
+    <h2 class="font-bold text-lg mb-4">All Skills</h2>
+    <div class="overflow-x-auto">
+      <table class="w-full bg-white border border-gray-300 rounded-md">
+        <thead class="bg-gray-100">
+          <tr>
+            <th class="py-2 px-4 border-b">Skill Name</th>
+            <th class="py-2 px-4 border-b">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let skill of skills">
+            <td class="py-2 px-4 border-b">{{ skill.name }}</td>
+            <td class="py-2 px-4 border-b">
+              <button
+                class="px-2 py-1 bg-red-500 text-white rounded"
+                (click)="deleteSkill(skill.id)"
+              >
+                Delete
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <!-- Add New Skill -->
+    <div class="mt-8">
+      <h2 class="font-bold text-lg mb-4">Add New Skill</h2>
+      <form [formGroup]="newSkillForm" class="flex items-center gap-4">
+        <select
+          formControlName="name"
+          class="border-2 border-primary px-2 py-1 rounded"
+        >
+          <option value="" disabled selected>Select a skill</option>
+          <option value="First Aid">First Aid</option>
+          <option value="Search and Rescue">Search and Rescue</option>
+          <option value="Emergency Communication">
+            Emergency Communication
+          </option>
+          <option value="Shelter Management">Shelter Management</option>
+          <option value="Community Outreach">Community Outreach</option>
+          <option value="Medical Triage">Medical Triage</option>
+          <option value="Logistics Planning">Logistics Planning</option>
+          <option value="Psychological Support">Psychological Support</option>
+          <option value="Water Purification">Water Purification</option>
+          <option value="Food Distribution">Food Distribution</option>
+          <option value="Field Cooking">Field Cooking</option>
+          <option value="Public Health">Public Health</option>
+          <option value="Emergency Shelter Construction">
+            Emergency Shelter Construction
+          </option>
+          <option value="Conflict Resolution">Conflict Resolution</option>
+          <option value="Radio Operation">Radio Operation</option>
+          <option value="GIS Mapping">GIS Mapping</option>
+          <option value="Volunteer Coordination">Volunteer Coordination</option>
+          <option value="Disaster Assessment">Disaster Assessment</option>
+          <option value="Crisis Counseling">Crisis Counseling</option>
+        </select>
+        <button
+          class="px-4 py-2 bg-primary text-white rounded"
+          (click)="addSkill()"
+        >
+          Add Skill
+        </button>
+      </form>
+    </div>
+  </div>
+</div>

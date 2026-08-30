@@ -1,0 +1,73 @@
+<div class="hero min-h-screen bg-base-100">
+  <div class="hero-content flex-col md:w-2/4 lg:flex-row-reverse">
+    <div class="text-center lg:text-left">
+      <h1 class="text-5xl font-bold text-neutral">Login now!</h1>
+      <p class="py-6 text-neutral">Welcome!</p>
+    </div>
+    <div class="card flex-shrink-0 w-full max-w-sm shadow-2xl bg-base-100">
+      <form
+        [formGroup]="loginForm"
+        (ngSubmit)="loginHandler()"
+        class="card-body"
+      >
+        <div class="form-control">
+          <label class="label" for="email">
+            <span class="label-text text-neutral">Email</span>
+          </label>
+          <input
+            type="text"
+            placeholder="Email"
+            formControlName="email"
+            class="input input-bordered"
+            required
+            email
+          />
+          <div
+            *ngIf="
+              loginForm.get('email')?.invalid && loginForm.get('email')?.touched
+            "
+          >
+            <span class="text-error">
+              <div *ngIf="loginForm.get('email')?.hasError('required')">
+                Email is required.
+              </div>
+              <div *ngIf="loginForm.get('email')?.hasError('email')">
+                Invalid email format.
+              </div>
+            </span>
+          </div>
+        </div>
+        <div class="form-control">
+          <label class="label" for="password">
+            <span class="label-text text-neutral">Password</span>
+          </label>
+          <input
+            type="password"
+            placeholder="Password"
+            formControlName="password"
+            class="input input-bordered"
+            required
+          />
+          <div
+            *ngIf="
+              loginForm.get('password')?.invalid &&
+              loginForm.get('password')?.touched
+            "
+          >
+            <span class="text-error">
+              <div *ngIf="loginForm.get('password')?.hasError('required')">
+                Password is required.
+              </div>
+            </span>
+          </div>
+        </div>
+        <div class="form-control flex gap-2">
+          <button class="btn btn-primary text-white" type="submit">
+            Login
+          </button>
+          <a routerLink="/signup" class="btn btn-primary text-white">SignUp</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

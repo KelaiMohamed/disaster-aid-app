@@ -1,0 +1,22 @@
+spring:
+  application:
+    name: REGISTRY-SERVICE
+
+eureka:
+  client:
+    register-with-eureka: false
+    fetch-registry: false
+
+server:
+  port: ${SERVER_PORT:8761}
+
+management:
+  endpoint:
+    health:
+      probes:
+        enabled: true
+  health:
+    livenessstate:
+      enabled: true
+    readinessstate:
+      enabled: true

@@ -1,0 +1,67 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: victim-service
+  labels:
+    app: victim-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: victim-service
+  template:
+    metadata:
+      labels:
+        app: victim-service
+    spec:
+      containers:
+        - name: victim-service
+          image: ghcr.io/OWNER/REPO/victim-service:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8082
+          env:
+            - name: SERVER_PORT
+              value: "8082"
+            - name: DB_URL
+              value: "jdbc:postgresql://postgres:5432/victim"
+            - name: DB_USERNAME
+              value: "postgres"
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: disaster-aid-secrets
+                  key: DB_PASSWORD
+            - name: EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE
+              value: "http://eureka:8761/eureka/"
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: 8082
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8082
+            initialDelaySeconds: 45
+            periodSeconds: 15
+          resources:
+            requests:
+              cpu: 250m
+              memory: 384Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: victim-service-svc
+spec:
+  selector:
+    app: victim-service
+  ports:
+    - port: 80
+      targetPort: 8082

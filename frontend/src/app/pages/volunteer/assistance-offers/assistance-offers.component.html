@@ -1,0 +1,28 @@
+<div class="container py-4 h-screen mx-auto">
+  <div class="flex justify-center items-center flex-wrap gap-4">
+    <div *ngFor="let offer of assistanceOffers" class="card w-96 shadow-xl">
+      <div class="card-body">
+        <p class="text-cyan-700 font-semibold">Date Offer Made:</p>
+        <span class="text-black">{{
+          offer.dateOfferMade | date: "dd/MM/yyyy"
+        }}</span>
+        <div class="mt-4">
+          <p class="text-cyan-700 font-semibold">Donations:</p>
+          <ul class="list-disc list-inside">
+            <li *ngFor="let donation of offer.donations">
+              <span class="text-black">{{ donation.donationDescription }}</span>
+            </li>
+          </ul>
+        </div>
+        <div class="mt-4">
+          <p class="text-cyan-700 font-semibold">Aid Types:</p>
+          <ul class="list-disc list-inside">
+            <li *ngFor="let aidType of offer.aidTypes" class="text-black">
+              {{ aidType.name }}
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
